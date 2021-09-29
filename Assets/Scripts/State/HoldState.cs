@@ -4,14 +4,12 @@ using UnityEngine;
 
 public class HoldState :IdleState
 {
-    public HoldState(PlayerController setCharacher) : base(setCharacher) {
+    public HoldState() {
 
     }
 
     public override void update() {
-        float h = Input.GetAxis("Horizontal");
-
-        characher.cameraRotation(h);
+        characher.cameraRotation();
         jumpkeyInput();
     }
 

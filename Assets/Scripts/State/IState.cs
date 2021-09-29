@@ -2,7 +2,7 @@ using UnityEngine;
 
 public interface IState
 {
-    void init();
+    void enter();
     void update();
     void fixedUpdate();
     void exit();

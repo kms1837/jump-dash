@@ -19,7 +19,7 @@ public class PlayerController : MonoBehaviour {
 
     private Rigidbody playerRigidbody;
 
-    private IState currentState; // FSM
+    private CharacterState currentState; // FSM
 
     private bool firstPerson = false;
 
@@ -27,13 +27,17 @@ public class PlayerController : MonoBehaviour {
 
     private Vector3 dashForwad;
 
+    private float cameraAngleY = 0;
+
     public IState CurrentState {
         get => currentState;
     }
 
     void Start() {
         playerRigidbody = this.GetComponent<Rigidbody>();
-        currentState = new IdleState(this);
+        currentState = new IdleState();
+        currentState.init(this);
+        cameraAngleY = Camera.main.transform.localRotation.eulerAngles.y;
     }
 
     void Update() {
@@ -46,6 +50,7 @@ public class PlayerController : MonoBehaviour {
         if (transform.position.y < -10) {
             this.transform.position = generatePos;
             playerRigidbody.velocity = Vector3.zero;
+            this.setState(new IdleState());
         }
     }
 
@@ -53,23 +58,41 @@ public class PlayerController : MonoBehaviour {
         currentState.fixedUpdate();
     }
 
-    public void setState(IState newState) {
+    public void setState(CharacterState newState) {
         currentState.exit();
 
         currentState = newState;
-
-        currentState.init();
+        currentState.init(this);
+        currentState.enter();
     }
 
-    public void cameraRotation(float x) {
-        playerRigidbody.rotation = playerRigidbody.rotation * Quaternion.Euler(0.0f, x, 0.0f);
+    public void cameraRotation() {
+        float y = firstPerson ? Input.GetAxis("Mouse Y") : 0;
+        Transform cameraTransform = firstPersonCamera.transform;
+
+        if(firstPerson) {
+            float x = Input.GetAxis("Mouse X");
+            playerRigidbody.rotation *= Quaternion.Euler(0.0f, x, 0.0f); 
+        }
+        else {
+            Vector3 mousePosition = Input.mousePosition;
+            Vector2 screenCenter = new Vector2(Screen.width / 2, Screen.height / 2);
+            float dx = screenCenter.x - mousePosition.x;
+            float dy = screenCenter.y - mousePosition.y;
+            float rotationY = Mathf.Atan2(-1 * dy, dx) * Mathf.Rad2Deg;
+
+            playerRigidbody.rotation = Quaternion.Euler(0.0f, rotationY - cameraAngleY, 0.0f);
+        }
+        cameraTransform.localRotation = cameraTransform.localRotation * Quaternion.Euler(y * -1, 0.0f, 0.0f);
     }
 
-    public void move(float depth) {
+    public void move() {
+        float depth = Input.GetAxis("Vertical");
+        float horizontal = firstPerson ? Input.GetAxis("Horizontal") : 0;
         float totalSpeed = moveSpeed;
         float moveDepth = depth * totalSpeed;
 
-        playerRigidbody.velocity = transform.forward * moveDepth + new Vector3(0, playerRigidbody.velocity.y, 0);
+        playerRigidbody.velocity = transform.forward * moveDepth + new Vector3(horizontal * 10, playerRigidbody.velocity.y, 0);
     }
 
     public void jump() {
@@ -88,6 +111,7 @@ public class PlayerController : MonoBehaviour {
         firstPerson = !firstPerson;
         mainCamera.enabled = !firstPerson;
         firstPersonCamera.enabled = firstPerson;
+        Cursor.lockState = firstPerson ? CursorLockMode.Locked : CursorLockMode.None;
     }
 
     public void hold(float colliderTop) {
@@ -113,7 +137,7 @@ public class PlayerController : MonoBehaviour {
         test.position = hitPoint;
         
         if (characterBottom > colliderTop) {
-            this.setState(new IdleState(this));
+            this.setState(new IdleState());
             generatePos = other.transform.position + new Vector3(0, 10, 0);
         }
     }

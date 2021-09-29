@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class JumpingState :IdleState
 {
-    public JumpingState(PlayerController setCharacher) : base(setCharacher) {
+    public JumpingState() {
 
     }
 
@@ -13,7 +13,7 @@ public class JumpingState :IdleState
 
         if (Input.GetKeyUp(KeyCode.Space)) {
             characher.dashStart();
-            characher.setState(new JumpDashState(characher));
+            characher.setState(new JumpDashState());
         }
     }
 
@@ -35,7 +35,7 @@ public class JumpingState :IdleState
 
             if (holding) {
                 characher.hold(colliderTop);
-                characher.setState(new HoldState(characher));
+                characher.setState(new HoldState());
             }
             Debug.Log($"{hitPoint.y} {(colliderTop - handSize)}");
             //Debug.Log($"{other.transform.localScale.y} {isWallHold}");

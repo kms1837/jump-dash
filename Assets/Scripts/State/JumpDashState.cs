@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class JumpDashState :JumpingState
 {
-    public JumpDashState(PlayerController setCharacher) : base(setCharacher) {
+    public JumpDashState() {
 
     }
 

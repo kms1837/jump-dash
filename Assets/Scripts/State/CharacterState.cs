@@ -4,11 +4,14 @@ public class CharacterState :IState
 {
     protected PlayerController characher;
 
-    public CharacterState(PlayerController setCharacher) {
+    public CharacterState() {
+    }
+
+    public void init(PlayerController setCharacher) {
         characher = setCharacher;
     }
 
-    public virtual void init() {
+    public virtual void enter() {
 
     }
 

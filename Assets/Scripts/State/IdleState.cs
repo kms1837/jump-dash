@@ -3,10 +3,10 @@ using UnityEngine;
 public class IdleState :CharacterState
 {
 
-    public IdleState(PlayerController setCharacher): base(setCharacher) {
+    public IdleState() {
     }
 
-    public override void init() {
+    public override void enter() {
     }
 
     public override void exit() {
@@ -23,17 +23,14 @@ public class IdleState :CharacterState
     }
 
     protected void moveInputkey() {
-        float h = Input.GetAxis("Horizontal");
-        float v = Input.GetAxis("Vertical");
-
-        characher.move(v);
-        characher.cameraRotation(h);
+        characher.move();
+        characher.cameraRotation();
     }
 
     protected void jumpkeyInput() {
         if (Input.GetKeyUp(KeyCode.Space)) {
             characher.jump();
-            characher.setState(new JumpingState(characher));
+            characher.setState(new JumpingState());
         }
     }
 }
